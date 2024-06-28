@@ -1,15 +1,39 @@
 {
-    "editor.bracketPairColorization.enabled": true,
-    "editor.guides.bracketPairs": true,
-    "editor.formatOnSave": true,
-    "editor.defaultFormatter": "esbenp.prettier-vscode",
-    "editor.codeActionsOnSave": ["source.fixAll.eslint"],
-    "eslint.validate": ["javascript", "javascriptreact", "typescript", "vue"],
-    "prettier.requireConfig": true,
+  "editor.bracketPairColorization.enabled": true,
+  "editor.guides.bracketPairs": true,
+  // General settings
+  "editor.tabSize": 2, // Default setting for all files
+  "editor.detectIndentation": false, // Ensure VSCode doesn't override settings based on file content
 
-    "python.analysis.typeCheckingMode": "basic",
-    "python.analysis.autoImportCompletions": true,
-    "python.analysis.diagnosticSeverityOverrides": {
-        "reportOptionalMemberAccess": false
-    }
+  // Python specific settings
+  "[python]": {
+    "editor.tabSize": 4,
+    "editor.insertSpaces": true, // Use spaces instead of tabs
+    "editor.defaultFormatter": "ms-python.python"
+  },
+
+  // JavaScript specific settings
+  "[javascript]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+
+  // Vue specific settings
+  "[vue]": {
+    "editor.tabSize": 2,
+    "editor.insertSpaces": true,
+    "editor.defaultFormatter": "esbenp.prettier-vscode"
+  },
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": ["source.fixAll.eslint"],
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "vue"],
+  "prettier.requireConfig": true,
+
+  "python.analysis.typeCheckingMode": "basic",
+  "python.analysis.autoImportCompletions": true,
+  "python.analysis.diagnosticSeverityOverrides": {
+    "reportOptionalMemberAccess": false
+  }
 }
