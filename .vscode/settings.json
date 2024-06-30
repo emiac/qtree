@@ -8,8 +8,7 @@
   // Python specific settings
   "[python]": {
     "editor.tabSize": 4,
-    "editor.insertSpaces": true, // Use spaces instead of tabs
-    "editor.defaultFormatter": "ms-python.python"
+    "editor.insertSpaces": true // Use spaces instead of tabs
   },
 
   // JavaScript specific settings
@@ -34,6 +33,7 @@
 
   "python.analysis.typeCheckingMode": "basic",
   "python.analysis.autoImportCompletions": true,
+  "python.languageServer": "Pylance",
   "python.analysis.diagnosticSeverityOverrides": {
     "reportOptionalMemberAccess": false
   }
