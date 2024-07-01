@@ -14,14 +14,41 @@
         size="md"
         label="Fetch Tree"
         no-caps
-        @click="fetchTree"
+        @click="treeStore.fetchTree()"
       ></q-btn>
     </div>
     <q-separator></q-separator>
-    <div class="q-pa-xs row items-left">
-      <q-toggle size="xs" v-model="isDense" label="Dense"></q-toggle>
-      <q-toggle size="xs" v-model="isAccordion" label="Accordion"></q-toggle>
-      <div class="row items-center q-ml-sm">Selected ID: {{ selected }}</div>
+    <div class="q-pa-sm row items-left">
+      <q-toggle size="sm" v-model="isDense" label="Dense"></q-toggle>
+      <q-toggle size="sm" v-model="isAccordion" label="Accordion"></q-toggle>
+      <div class="row items-center q-ml-sm">Selected ID: {{ selectedId }}</div>
+      <q-btn
+        class="q-ml-sm"
+        color="blue"
+        dense
+        size="md"
+        label="Expand Top"
+        no-caps
+        @click="expandTopLevel"
+      ></q-btn>
+      <q-btn
+        class="q-ml-sm"
+        color="blue"
+        dense
+        size="md"
+        label="Expand All"
+        no-caps
+        @click="expandAllLevels"
+      ></q-btn>
+      <q-btn
+        class="q-ml-sm"
+        color="blue"
+        dense
+        size="md"
+        label="Collapse All"
+        no-caps
+        @click="collapseAll"
+      ></q-btn>
     </div>
     <q-separator></q-separator>
     <div class="q-pa-md">
@@ -29,16 +56,16 @@
         :dense="isDense"
         :accordion="isAccordion"
         node-key="id"
-        :nodes="nodes"
-        v-model:selected="selected"
-        @update:selected="console.log('selected')"
+        :nodes="tree"
+        v-model:selected="selectedId"
+        v-model:expanded="expandedId"
         no-nodes-label="No account supplied."
         no-transition
       >
         <template #default-header="prop">
           <div
             class="row items-center"
-            :class="{ 'selected-class': prop.node.id === selected }"
+            :class="{ 'selected-class': prop.node.id === selectedId }"
           >
             <q-icon
               :name="prop.node.icon"
@@ -55,36 +82,36 @@
 </template>
 
 <script setup>
-import { ref } from 'vue'
+import { ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useTreeStore } from 'src/stores/tree.js'
 const treeStore = useTreeStore()
-const { nodes, accountId } = storeToRefs(treeStore)
+const { tree, accountId } = storeToRefs(treeStore)
 
-const selected = ref()
+// This must be ref(null).  ref() does not work!
+const selectedId = ref(null)
+const expandedId = ref([])
 const isDense = ref(false)
 const isAccordion = ref(false)
 
-const fetchTree = async () => {
-  if (!accountId.value) {
-    accountId.value = 'a1'
-  }
-  const body = JSON.stringify({ accountId: accountId.value })
+// Watch the tree and expand the top accounts when it changes
+watch(tree, () => {
+  expandedId.value = treeStore.expandAccounts()
+})
 
-  console.log(`body: ${body}`)
-  const reponse = await fetch('http://localhost:5000/get_tree', {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json',
-      'Access-Control-Allow-Origin': true,
-    },
-    body,
-  })
-  const reply = await reponse.json()
-  console.log(reply)
-  const tree = treeStore.addIcons(reply.data)
-  console.log('tree: ', tree)
-  nodes.value = tree
+const expandTopLevel = () => {
+  console.log('Tree.vue::expandTopLevel()')
+  expandedId.value = treeStore.expandTopLevels()
+}
+
+const expandAllLevels = () => {
+  console.log('Tree.vue::expandAllLevels()')
+  console.log(treeStore.expandAllLevels())
+  expandedId.value = treeStore.expandAllLevels()
+}
+
+const collapseAll = () => {
+  expandedId.value = []
 }
 </script>
 
