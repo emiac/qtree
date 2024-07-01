@@ -151,8 +151,7 @@ const getNodeIdsDownToType = (node) => {
     const childIds = []
     node.children.forEach((c) => {
       if (types.includes(c.type)) {
-        const childNodes = traverse(c)
-        childIds.push(...childNodes)
+        childIds.push(...traverse(c))
       }
     })
     idArr.push(...childIds)
@@ -213,50 +212,17 @@ export const useTreeStore = defineStore('tree', () => {
 
   const expandAllLevels = () => {
     console.log('tree.js::expandAllLevels()')
-    // console.log('tree: ', tree.value)
-    // const node = tree.value[0]
-    // console.log('node: ', node)
-    // const ids = getNodeIdsDownToType(node)
-    // console.log('ids: ', ids)
-
     const ids = []
     tree.value.forEach((account) => {
-      console.log('account = ', account)
-      console.log(account.id)
       ids.push(account.id)
-      console.log('ids: ', ids)
       if (account.children) {
         account.children.forEach((c) => {
-          console.log('c.id: ', c.id)
           ids.push(c.id)
-          console.log('ids: ', ids)
-          console.log('Calling getNodeIdsDownToType(c)...')
-          const childNodes = getNodeIdsDownToType(c)
-          console.log('childNodes: ', childNodes)
-          ids.push([...childNodes])
-          console.log('ids: ', ids)
+          ids.push(...getNodeIdsDownToType(c))
         })
       }
     })
-    console.log('return ids: ', ids)
     return ids
-
-    // const accountIds = []
-    // const levelIds = []
-    // tree.value.forEach((account) => {
-    //   accountIds.push(account.id)
-    //   if (account.children) {
-    //     account.children.forEach((node) => {
-    //       if (node.type === 'level') {
-    //         levelIds.push(node.id)
-    //         levelIds.push(...getLevelIds(node))
-    //       }
-    //     })
-    //   }
-    //   console.log(accountIds)
-    //   return accountIds
-    //   // return [...accountIds, ...levelIds]
-    // })
   }
 
   return {
