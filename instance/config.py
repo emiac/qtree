@@ -1,6 +1,0 @@
-MYSQL_HOST = 'localhost'
-MYSQL_DB = 'qtree'
-MYSQL_USER = 'ashley'
-MYSQL_PASSWORD = 'tellab@N529'
-MYSQL_CURSORCLASS = 'DictCursor'
-SECRET_KEY = 'dev'
