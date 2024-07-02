@@ -73,3 +73,61 @@ WHERE
     accountId = 'a1';
 
 
+CREATE TABLE IF NOT EXISTS site (
+    siteId INT UNIQUE NOT NULL AUTO_INCREMENT,
+    siteNum INT UNIQUE NOT NULL,
+    parentKey VARCHAR(8) NOT NULL,
+    siteText VARCHAR(32) NOT NULL, 
+    PRIMARY KEY (siteId),
+    CONSTRAINT UNIQUE  con_unique_parent_site (parentKey, siteText),
+    INDEX idx_parent (parentKey)
+);
+
+INSERT INTO site (siteNum, parentKey, siteText) VALUES (1, 'a1', 'Carlow North');
+
+SELECT 
+    CONCAT('s', siteNum) AS custom_key, 
+    siteText
+FROM 
+    site;
+
+
+-- import mysql.connector
+
+-- # Establish the connection
+-- conn = mysql.connector.connect(
+--     host="localhost",
+--     user="yourusername",
+--     password="yourpassword",
+--     database="yourdatabase"
+-- )
+
+-- cursor = conn.cursor()
+
+-- # Get the next auto increment value
+-- cursor.execute("SHOW TABLE STATUS LIKE 'my_table'")
+-- row = cursor.fetchone()
+-- next_id = row[10]
+
+-- # Construct the custom key
+-- custom_key = f"a{next_id}"
+
+-- # Insert the new row
+-- insert_query = "INSERT INTO my_table (custom_key, other_column) VALUES (%s, %s)"
+-- cursor.execute(insert_query, (custom_key, 'some value'))
+
+-- # Commit the transaction
+-- conn.commit()
+
+-- # Close the connection
+-- cursor.close()
+-- conn.close()
+
+
+SELECT Name FROM SHOW TABLE STATUS LIKE 'site';
+SELECT * FROM SHOW TABLE STATUS LIKE 'site';
+
+
+
+
+
