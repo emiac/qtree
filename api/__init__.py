@@ -1,10 +1,11 @@
+from ast import expr_context
 import copy
 
 from flask import Flask, request, jsonify
 from flask_mysqldb import MySQL, MySQLdb
 from flask_cors import CORS
 
-def get_account(cursor, account_id: str) -> dict:
+def get_account(cursor, account_id: str) -> list[dict]:
     query = '''
                 SELECT
                     accountId AS id,
@@ -15,7 +16,7 @@ def get_account(cursor, account_id: str) -> dict:
                     accountId = %s
             '''
     cursor.execute(query, (account_id, ))
-    return cursor.fetchone()
+    return cursor.fetchall()
 
 def get_top_level_nodes(cursor, account_id: str) -> list[dict]:
 
@@ -30,6 +31,7 @@ def get_top_level_nodes(cursor, account_id: str) -> list[dict]:
             parentId = %s
     '''
     cursor.execute(query, (account_id, ))
+    # Returns a list of levels
     return cursor.fetchall()
 
 def get_level_children(cursor, node: dict) -> list[dict]:
@@ -94,7 +96,6 @@ def create_app():
 
     @app.route('/get_tree', methods=['POST'])
     def get_tree():
-        print('Arrived...')
         body = request.get_json()
         account_id = body['accountId']
         # return jsonify({
@@ -102,20 +103,31 @@ def create_app():
         #         'data': account_id
         #     })
 
+        # Create the root node
+        tree = {
+            'id': 'r0',
+            'parentId': None,
+            'text': 'Home'
+        }
 
         try:
             with db.connection.cursor() as cursor:
-                tree = get_account(cursor=cursor, account_id=account_id)
-                top_level_nodes = get_top_level_nodes(cursor=cursor, account_id=account_id)
-                tree['children'] = []
-                for child in top_level_nodes:
-                    child = build_tree(cursor=cursor, node=child)
+                accounts = get_account(cursor=cursor, account_id=account_id) # list[dic]
+                for account in accounts:
+                    account['parentId'] = 'r0'
+                tree['children'] = accounts
+                
+                for account in tree['children']:
+                    child = build_tree(cursor=cursor, node=account)
                     # print('Top-level node: {c}'.format(c=child))
-                    tree['children'].append(child)
+                    try:
+                        account['children'].append(child)
+                    except KeyError:
+                        account['children'] = [child]
 
                 return jsonify({
                     'status': 'ok',
-                    'data': [ tree ]
+                    'data': tree
                 })
         except MySQLdb.OperationalError as err:
             return jsonify({

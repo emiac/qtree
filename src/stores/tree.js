@@ -4,7 +4,11 @@ import { defineStore } from 'pinia'
 const addType = (node) => {
   let nodeType
   switch (node.id.substring(0, 1)) {
-    // assets
+    // root
+    case 'r':
+      nodeType = 'root'
+      break
+    // account
     case 'a':
       nodeType = 'account'
       break
@@ -37,7 +41,11 @@ const addIcon = (node) => {
   // Returns an icon based on first character in node ID
   let icon
   switch (node.type) {
-    // assets
+    // root
+    case 'root':
+      icon = 'home'
+      break
+    // account
     case 'account':
       icon = 'factory'
       break
@@ -81,28 +89,31 @@ const addIcon = (node) => {
 
 const addIconColour = (node) => {
   let iconColour = ''
-  switch (node.id.substring(0, 1)) {
-    // assets
-    case 'a':
+  switch (node.type) {
+    case 'root':
+      iconColour = 'black'
+      break
+    // account
+    case 'account':
       iconColour = 'black'
       break
     // levels
-    case 'l':
+    case 'level':
       iconColour = 'blue'
       break
-    case 'm':
+    case 'asset':
       iconColour = 'green'
       break
     // component
-    case 'c':
+    case 'component':
       iconColour = 'red'
       break
     // sample point
-    case 'p':
+    case 'sample-point':
       iconColour = 'orange'
       break
     // sample
-    case 's':
+    case 'sample':
       iconColour = 'yellow'
       break
     default:
@@ -111,18 +122,17 @@ const addIconColour = (node) => {
   return iconColour
 }
 
-const fixNodes = (nodeArray) => {
+const fixNode = (node) => {
   // Adds icon and type to tree
-  nodeArray.forEach((node) => {
-    node.type = addType(node)
-    node.icon = addIcon(node)
-    node.iconColour = addIconColour(node)
-    if (node.children) {
-      return fixNodes(node.children)
-    }
-    return node
-  })
-  return nodeArray
+  console.log('fixNode().node = ', node)
+  node.type = addType(node)
+  node.icon = addIcon(node)
+  node.iconColour = addIconColour(node)
+  if (node.children) {
+    node.children.forEach((c) => fixNode(c))
+  }
+  console.log('fixNode(): Returning node: ', node)
+  return node
 }
 
 const traverse = (node) => {
@@ -182,16 +192,18 @@ export const useTreeStore = defineStore('tree', () => {
       body
     })
     const reply = await reponse.json()
+    console.log('reply: ', reply.data)
 
-    tree.value = fixNodes(reply.data)
+    tree.value = [fixNode(reply.data)]
     console.log('treeStore.js::fetchTree() at end: tree: ', tree.value)
   }
 
   const expandAccounts = () => {
-    console.log('treeStore::expandTopLevel()')
+    console.log('treeStore::expandAccounts()')
     const idArr = []
-    console.log(tree.value)
-    tree.value.forEach((account) => {
+    console.log(tree.value[0]) // Object
+    tree.value[0].children.forEach((account) => {
+      console.log('expandAccounts().account = ', account)
       idArr.push(account.id)
     })
     return idArr
@@ -199,7 +211,7 @@ export const useTreeStore = defineStore('tree', () => {
 
   const expandTopLevels = () => {
     const idArr = []
-    tree.value.forEach((account) => {
+    tree.value[0].children.forEach((account) => {
       idArr.push(account.id)
       if (account.children) {
         account.children.forEach((topLevelNode) => {
