@@ -177,10 +177,11 @@ export const useTreeStore = defineStore('tree', () => {
   // Actions
   const fetchTree = async () => {
     // Returns a basic tree consisting of an account + levels only.
+    let accountIds
     if (!accountId.value) {
-      accountId.value = 'a1'
+      accountIds = ['a1']
     }
-    const body = JSON.stringify({ accountId: accountId.value })
+    const body = JSON.stringify({ accountId: accountIds })
 
     console.log(`body: ${body}`)
     const reponse = await fetch('http://localhost:5000/get_tree', {

@@ -97,27 +97,24 @@ def create_app():
     @app.route('/get_tree', methods=['POST'])
     def get_tree():
         body = request.get_json()
-        account_id = body['accountId']
+        account_ids = body['accountIds']  # list
         # return jsonify({
         #         'status': 'ok',
         #         'data': account_id
         #     })
 
-        # Create the root node
-        tree = {
-            'id': 'r0',
-            'parentId': None,
-            'text': 'Home'
-        }
+        tree = []
 
         try:
             with db.connection.cursor() as cursor:
-                accounts = get_account(cursor=cursor, account_id=account_id) # list[dic]
-                for account in accounts:
-                    account['parentId'] = 'r0'
-                tree['children'] = accounts
-                
-                for account in tree['children']:
+
+                # Populate the tree with the accounts
+                for acc_id in account_ids:
+                    account = get_account(cursor=cursor, account_id=acc_id) # list[dic]
+                    tree.append(account)
+
+                # Add the root sites
+                for account in tree:
                     child = build_tree(cursor=cursor, node=account)
                     # print('Top-level node: {c}'.format(c=child))
                     try:
