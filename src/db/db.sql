@@ -17,16 +17,17 @@ CREATE TABLE account (
     accountId INT UNIQUE NOT NULL AUTO_INCREMENT,
     account_groupId INT NOT NULL,
     accountText VARCHAR(32) UNIQUE NOT NULL,
+    accountActive TINYINT NOT NULL DEFAULT 1,
     PRIMARY KEY (accountId),
     UNIQUE INDEX idx_accountText (accountText)
 );
 
 INSERT INTO
-  account (account_groupId, accountText)
+    account (account_groupId, accountText)
 VALUES
-  (1, 'ESB - Power Generation'),
-  (1, 'ESB - Networks'),
-  (1, 'ESB - 38kV');
+    (1, 'ESB - Power Generation'),
+    (1, 'ESB - Networks'),
+    (1, 'ESB - 38kV');
 
 
 -- Sites have an extra classification as 'root' (boolean). 
@@ -35,13 +36,14 @@ VALUES
 -- Assets may be attached to any site.
 
 CREATE TABLE IF NOT EXISTS site (
-  siteId INT UNIQUE NOT NULL AUTO_INCREMENT,
-  parentId INT NOT NULL,
-  siteRoot TINYINT NOT NULL DEFAULT 0,
-  siteText VARCHAR(50) NOT NULL,
-  PRIMARY KEY (siteId),
-  INDEX idx_parent_id (parentId),
-  CONSTRAINT UNIQUE constraint_site_name (siteId, siteText)
+    siteId INT UNIQUE NOT NULL AUTO_INCREMENT,
+    parentId INT NOT NULL,
+    siteRoot TINYINT NOT NULL DEFAULT 0,
+    siteText VARCHAR(50) NOT NULL,
+    siteActive TINYINT NOT NULL DEFAULT 1,
+    PRIMARY KEY (siteId),
+    INDEX idx_parent_id (parentId),
+    CONSTRAINT UNIQUE constraint_site_name (siteId, siteText)
 );
 
 INSERT INTO

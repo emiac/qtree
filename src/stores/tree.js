@@ -4,19 +4,15 @@ import { defineStore } from 'pinia'
 const addType = (node) => {
   let nodeType
   switch (node.id.substring(0, 1)) {
-    // root
-    case 'r':
-      nodeType = 'root'
-      break
     // account
-    case 'a':
+    case 'n':
       nodeType = 'account'
       break
     // levels
-    case 'l':
-      nodeType = 'level'
+    case 'd':
+      nodeType = 'site'
       break
-    case 'm':
+    case 'a':
       nodeType = 'asset'
       break
     // component
@@ -41,20 +37,16 @@ const addIcon = (node) => {
   // Returns an icon based on first character in node ID
   let icon
   switch (node.type) {
-    // root
-    case 'root':
-      icon = 'home'
-      break
     // account
     case 'account':
       icon = 'factory'
       break
     // levels
-    case 'level':
+    case 'site':
       icon = 'folder'
       break
     case 'asset':
-      // asset (m = 'machine')
+      // asset
       switch (node.subType) {
         case 'truck':
           icon = 'local_shipping'
@@ -90,15 +82,12 @@ const addIcon = (node) => {
 const addIconColour = (node) => {
   let iconColour = ''
   switch (node.type) {
-    case 'root':
-      iconColour = 'black'
-      break
     // account
     case 'account':
       iconColour = 'black'
       break
     // levels
-    case 'level':
+    case 'site':
       iconColour = 'blue'
       break
     case 'asset':
@@ -181,7 +170,7 @@ export const useTreeStore = defineStore('tree', () => {
     if (!accountId.value) {
       accountIds = ['a1']
     }
-    const body = JSON.stringify({ accountId: accountIds })
+    const body = JSON.stringify({ accountIds })
 
     console.log(`body: ${body}`)
     const reponse = await fetch('http://localhost:5000/get_tree', {

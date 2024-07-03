@@ -5,84 +5,99 @@ from flask import Flask, request, jsonify
 from flask_mysqldb import MySQL, MySQLdb
 from flask_cors import CORS
 
-def get_account(cursor, account_id: str) -> list[dict]:
-    query = '''
-                SELECT
-                    accountId AS id,
-                    accountText AS text
-                FROM
-                    account
-                WHERE
-                    accountId = %s
-            '''
-    cursor.execute(query, (account_id, ))
-    return cursor.fetchall()
-
-def get_top_level_nodes(cursor, account_id: str) -> list[dict]:
+def get_account(cursor, account_id) -> dict:
+    '''Get an account node by accountId'''
 
     query = '''
         SELECT
-            levelId AS id,
-            parentId AS parentId,
-            levelText AS text
+            CONCAT('n', accountId) AS id,
+            accountText AS text
         FROM
-            level
+            account
         WHERE
-            parentId = %s
+            accountActive = 1
+                AND 
+            accountId = %s 
     '''
     cursor.execute(query, (account_id, ))
-    # Returns a list of levels
     return cursor.fetchall()
 
-def get_level_children(cursor, node: dict) -> list[dict]:
-    '''
-        Returns the node supplied, but with the added property of 'children' (if child nodes are present), else returns the original node untouched.
-
-        node = { 'levelId: 1, 'parentId': 'a1', 'levelText': 'Carlow' }
-        returns: [
-            { 'levelId: 'l3', 'parentId': 'l1', 'levelText': 'Carlow North' }
-            { 'levelId: 'l4', 'parentId': 'l2', 'levelText': 'Carlow South' }
-        ]
-    '''
-
-    n = copy.deepcopy(node)
-    # print('get_level_children().n = {n}'.format(n=n))
+def get_root_sites(cursor, account_id: str) -> list[dict]:
+    '''Select root site nodes by accountId'''
 
     query = '''
         SELECT
-            levelId AS id,
-            parentId AS parentId,
-            levelText AS text
+            CONCAT('d', siteId) AS id,
+            parent AS parentId,
+            siteText AS text
         FROM
-            level
+            site
         WHERE
+            siteActive = 1 
+                AND 
+            siteRoot = 1 
+                AND 
             parentId = %s
     '''
-    cursor.execute(query, (n['id'], ))
-    children = cursor.fetchall()
-    # [
-    #   { 'levelId': 2, 'parentId': 1, 'levelText': 'Carlow North' },
-    #   { 'levelId': 3, 'parentId': 1, 'levelText': 'Carlow South' },
-    # ]
+    cursor.execute(query, ('{a}'.format(a=account_id[1:]), ))
+    # Returns a list of site nodes
+    return cursor.fetchall()
 
-    return children
+def get_site_children(cursor, parent_id: str) -> list[dict]:
+    '''Return a tree of subsites for root site.'''
 
-# Recursive function
-def build_tree(cursor, node: dict) -> dict:
-    '''Recursively build the level tree.'''
+    query = '''
+        SELECT
+            CONCAT('d', siteId) AS id,
+            parent AS parentId,
+            siteText AS text
+        FROM
+            site
+        WHERE
+            siteActive = 1 
+                AND 
+            siteRoot = 0 
+                AND 
+            parentId = %s
+    '''
+    cursor.execute(query, ('{p}'.format(p=parent_id[1:]), ))
+    # Returns a list of site nodes
+    return cursor.fetchall()  # list[dict]
+
+def build_site_tree(cursor, node: dict) -> dict:
+    '''Builds a tree of sites from the root side node.'''
+
+    #   node = {
+    #       'id': 'd1',
+    #       'parentId': 'n1',
+    #       'text': 'Carlow'
+    #   }
 
     n = copy.deepcopy(node)
-    # print('build_tree().n = {n}'.format(n=n))
-    children = get_level_children(cursor=cursor,node=n)  # list
-    if len(children) == 0:
-        print('build_tree(). No children found. Returning n: {n}'.format(n=n))
+    site_children = get_site_children(cursor=cursor, parent_id=n['parentId'])
+    if len(site_children) == 0:
         return n
-
-    n['children'] = []
-    for child in children:
-        child = build_tree(cursor=cursor, node=child)
-        n['children'].append(child)
+    n['children'] = site_children
+    for child in site_children:
+        child = build_site_tree(cursor=cursor, node=child)
     return n
+
+# # Recursive function
+# def build_tree(cursor, node: dict) -> dict:
+#     '''Recursively build the level tree.'''
+
+#     n = copy.deepcopy(node)
+#     # print('build_tree().n = {n}'.format(n=n))
+#     children = get_level_children(cursor=cursor,node=n)  # list
+#     if len(children) == 0:
+#         print('build_tree(). No children found. Returning n: {n}'.format(n=n))
+#         return n
+
+#     n['children'] = []
+#     for child in children:
+#         child = build_tree(cursor=cursor, node=child)
+#         n['children'].append(child)
+#     return n
 
 db = MySQL()
 
@@ -115,12 +130,16 @@ def create_app():
 
                 # Add the root sites
                 for account in tree:
-                    child = build_tree(cursor=cursor, node=account)
+                    root_sites = get_root_sites(cursor=cursor, account_id=account)
                     # print('Top-level node: {c}'.format(c=child))
                     try:
-                        account['children'].append(child)
+                        account['children'].append(root_sites)
                     except KeyError:
-                        account['children'] = [child]
+                        account['children'] = [root_sites]
+
+                    # Get the sub sites for each root site
+                    for root_site in account['children']:
+                        root_site = build_site_tree(cursor=cursor, node=root_site)
 
                 return jsonify({
                     'status': 'ok',
