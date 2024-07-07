@@ -1,5 +1,5 @@
-from ast import expr_context
 import copy
+from typing import Union
 
 from flask import Flask, request, jsonify
 from flask_mysqldb import MySQL, MySQLdb
@@ -19,8 +19,9 @@ def get_account(cursor, account_id) -> dict:
                 AND 
             accountId = %s 
     '''
-    cursor.execute(query, (account_id, ))
-    return cursor.fetchall()
+    cursor.execute(query, (account_id[1:], ))
+    account_data = cursor.fetchone()
+    return account_data
 
 def get_root_sites(cursor, account_id: str) -> list[dict]:
     '''Select root site nodes by accountId'''
@@ -28,7 +29,7 @@ def get_root_sites(cursor, account_id: str) -> list[dict]:
     query = '''
         SELECT
             CONCAT('d', siteId) AS id,
-            parent AS parentId,
+            CONCAT('n', parentId) AS parentId,
             siteText AS text
         FROM
             site
@@ -39,7 +40,7 @@ def get_root_sites(cursor, account_id: str) -> list[dict]:
                 AND 
             parentId = %s
     '''
-    cursor.execute(query, ('{a}'.format(a=account_id[1:]), ))
+    cursor.execute(query, (account_id, ))
     # Returns a list of site nodes
     return cursor.fetchall()
 
@@ -49,7 +50,7 @@ def get_site_children(cursor, parent_id: str) -> list[dict]:
     query = '''
         SELECT
             CONCAT('d', siteId) AS id,
-            parent AS parentId,
+            CONCAT('d', parentId) AS parentId,
             siteText AS text
         FROM
             site
@@ -65,39 +66,23 @@ def get_site_children(cursor, parent_id: str) -> list[dict]:
     return cursor.fetchall()  # list[dict]
 
 def build_site_tree(cursor, node: dict) -> dict:
-    '''Builds a tree of sites from the root side node.'''
+    '''
+        Builds a tree of sites from the root side node.
 
-    #   node = {
-    #       'id': 'd1',
-    #       'parentId': 'n1',
-    #       'text': 'Carlow'
-    #   }
+        Accepts a node as an argument.
+        Returns a node .   
+    '''
 
     n = copy.deepcopy(node)
-    site_children = get_site_children(cursor=cursor, parent_id=n['parentId'])
+    site_children = get_site_children(cursor=cursor, parent_id=n['id'])
     if len(site_children) == 0:
         return n
-    n['children'] = site_children
-    for child in site_children:
-        child = build_site_tree(cursor=cursor, node=child)
-    return n
-
-# # Recursive function
-# def build_tree(cursor, node: dict) -> dict:
-#     '''Recursively build the level tree.'''
-
-#     n = copy.deepcopy(node)
-#     # print('build_tree().n = {n}'.format(n=n))
-#     children = get_level_children(cursor=cursor,node=n)  # list
-#     if len(children) == 0:
-#         print('build_tree(). No children found. Returning n: {n}'.format(n=n))
-#         return n
-
-#     n['children'] = []
-#     for child in children:
-#         child = build_tree(cursor=cursor, node=child)
-#         n['children'].append(child)
-#     return n
+    else:
+        kids = []
+        for child in site_children:
+            kids.append(build_site_tree(cursor, child))
+        n['children'] = kids
+        return n
 
 db = MySQL()
 
@@ -130,17 +115,19 @@ def create_app():
 
                 # Add the root sites
                 for account in tree:
-                    root_sites = get_root_sites(cursor=cursor, account_id=account)
-                    # print('Top-level node: {c}'.format(c=child))
+                    account_id = account['id'][1:]
+                    root_sites = get_root_sites(cursor=cursor, account_id=account_id)
                     try:
                         account['children'].append(root_sites)
                     except KeyError:
-                        account['children'] = [root_sites]
+                        account['children'] = root_sites
 
                     # Get the sub sites for each root site
+                    kids = []
                     for root_site in account['children']:
-                        root_site = build_site_tree(cursor=cursor, node=root_site)
-
+                        root_site = build_site_tree(cursor, root_site)  # node
+                        kids.append(root_site)
+                    account['children'] = kids
                 return jsonify({
                     'status': 'ok',
                     'data': tree
@@ -157,3 +144,22 @@ def create_app():
             })
 
     return app
+
+        # {id: d3, parent: d1, text: Carlow North}
+
+# # Recursive function
+# def build_tree(cursor, node: dict) -> dict:
+#     '''Recursively build the level tree.'''
+
+#     n = copy.deepcopy(node)
+#     # print('build_tree().n = {n}'.format(n=n))
+#     children = get_level_children(cursor=cursor,node=n)  # list
+#     if len(children) == 0:
+#         print('build_tree(). No children found. Returning n: {n}'.format(n=n))
+#         return n
+
+#     n['children'] = []
+#     for child in children:
+#         child = build_tree(cursor=cursor, node=child)
+#         n['children'].append(child)
+#     return n

@@ -4,14 +4,21 @@
   // For more information, visit: https://go.microsoft.com/fwlink/?linkid=830387
   "version": "0.2.0",
   "configurations": [
+    // Note: The app must already be running for debugger to work
     {
-      "name": "Launch Program",
-      "program": "${workspaceFolder}/app.js",
+      "type": "chrome",
       "request": "launch",
-      "skipFiles": ["<node_internals>/**"],
-      "type": "node"
+      // Use name property from package.json
+      "name": "qtree",
+      "url": "http://localhost:9000",
+      // To properly reflect changes after HMR with Vite
+      "enableContentValidation": false,
+      "webRoot": "${workspaceFolder}/src",
+      // No need to configure sourcemap explicitly for vite.
+      "sourceMapPathOverrides": {
+        "webpack://package-name/./src/*": "${webRoot}/*"
+      }
     },
-
     {
       "name": "Python Debugger: Flask",
       "type": "debugpy",

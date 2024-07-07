@@ -111,17 +111,21 @@ const addIconColour = (node) => {
   return iconColour
 }
 
-const fixNode = (node) => {
+const fixNodes = (nodeArr) => {
   // Adds icon and type to tree
-  console.log('fixNode().node = ', node)
-  node.type = addType(node)
-  node.icon = addIcon(node)
-  node.iconColour = addIconColour(node)
-  if (node.children) {
-    node.children.forEach((c) => fixNode(c))
-  }
-  console.log('fixNode(): Returning node: ', node)
-  return node
+  // Accepts an array of nodes as as the arguement
+  console.log('fixNode().node = ', nodeArr)
+  const returnArr = []
+  nodeArr.forEach((n) => {
+    n.type = addType(n)
+    n.icon = addIcon(n)
+    n.iconColour = addIconColour(n)
+    if (n.children) {
+      return fixNodes(n.children)
+    }
+    returnArr.push(n)
+  })
+  return returnArr
 }
 
 const traverse = (node) => {
@@ -165,7 +169,7 @@ export const useTreeStore = defineStore('tree', () => {
 
   // Actions
   const fetchTree = async () => {
-    // Returns a basic tree consisting of an account + levels only.
+    // Returns a basic tree consisting of an account + sites only.
     let accountIds
     if (!accountId.value) {
       accountIds = ['a1']
@@ -184,7 +188,7 @@ export const useTreeStore = defineStore('tree', () => {
     const reply = await reponse.json()
     console.log('reply: ', reply.data)
 
-    tree.value = [fixNode(reply.data)]
+    tree.value = fixNodes(reply.data)
     console.log('treeStore.js::fetchTree() at end: tree: ', tree.value)
   }
 

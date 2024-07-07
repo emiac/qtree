@@ -77,8 +77,31 @@ ALTER TABLE account
 ALTER TABLE site
   ADD COLUMN siteActive TINYINT NOT NULL DEFAULT 1;
 
+SELECT
+    CONCAT('d', siteId) AS id,
+    parentId AS parentId,
+    siteText AS text
+FROM
+    site
+WHERE
+    siteActive = 1 
+        AND 
+    siteRoot = 1 
+        AND 
+    parentId = 1;
 
-
+SELECT
+    CONCAT('d', siteId) AS id,
+    parentId AS parentId,
+    siteText AS text
+FROM
+    site
+WHERE
+    siteActive = 1 
+        AND 
+    siteRoot = 0 
+        AND 
+    parentId = 1;
 
 
 
