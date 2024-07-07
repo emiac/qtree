@@ -17,7 +17,7 @@ module.exports = {
   extends: [
     // Base ESLint recommended rules
     'eslint:recommended',
-    'plugin:prettier/recommended',
+    // 'plugin:prettier/recommended',
 
     // Uncomment any of the lines below to choose desired strictness,
     // but leave only one uncommented!
@@ -51,21 +51,23 @@ module.exports = {
   // add your custom rules here
   rules: {
     'prefer-promise-reject-errors': 'off',
-
+    'vue/html-self-closing': 'off',
+    'vue/singleline-html-element-content-newline': 'off',
+    'vue/max-attributes-per-line': 'off',
     indent: 'off',
 
-    'prettier/prettier': [
-      'error',
-      {
-        trailingComma: 'none',
-        tabWidth: 2,
-        useTabs: false,
-        semi: false,
-        singleQuote: true,
-        printWidth: 80,
-        endOfLine: 'lf'
-      }
-    ],
+    // 'prettier/prettier': [
+    //   'error',
+    //   {
+    //     trailingComma: 'none',
+    //     tabWidth: 2,
+    //     useTabs: false,
+    //     semi: false,
+    //     singleQuote: true,
+    //     printWidth: 80,
+    //     endOfLine: 'auto'
+    //   }
+    // ],
     // 'comma-dangle': 0,
 
     // allow debugger during development only
