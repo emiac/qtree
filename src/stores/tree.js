@@ -111,21 +111,24 @@ const addIconColour = (node) => {
   return iconColour
 }
 
-const fixNodes = (nodeArr) => {
-  // Adds icon and type to tree
-  // Accepts an array of nodes as as the arguement
-  console.log('fixNode().node = ', nodeArr)
-  const returnArr = []
+const fixTreeNodes = (nodeArr) => {
+  // Recursive function to add type, icon and iconColour to each node
+  // Argument is array of nodes
+  // Returns an array of nodes
+
+  const tree = []
   nodeArr.forEach((n) => {
     n.type = addType(n)
     n.icon = addIcon(n)
     n.iconColour = addIconColour(n)
     if (n.children) {
-      return fixNodes(n.children)
+      n.children = fixTreeNodes(n.children)
+      tree.push(n)
+    } else {
+      tree.push(n)
     }
-    returnArr.push(n)
   })
-  return returnArr
+  return tree
 }
 
 const traverse = (node) => {
@@ -188,7 +191,8 @@ export const useTreeStore = defineStore('tree', () => {
     const reply = await reponse.json()
     console.log('reply: ', reply.data)
 
-    tree.value = fixNodes(reply.data)
+    tree.value = fixTreeNodes(reply.data)
+    // tree.value = reply.data
     console.log('treeStore.js::fetchTree() at end: tree: ', tree.value)
   }
 
