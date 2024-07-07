@@ -3,7 +3,10 @@ root = true
 [*]
 end_of_line = lf
 insert_final_newline = true
+trim_trailing_whitespace = true
 charset = utf-8
+indent_size = 2
+indent_style = space
 
 [*.{js,jsx,ts,tsx,html,css,scss}]
 indent_style = space
@@ -15,4 +18,5 @@ indent_size = 4
 
 # Trailing whitespace should be trimmed in all markdown files
 [*.md]
-trim_trailing_whitespace = true
+# trim_trailing_whitespace = true
+max_line_length = off

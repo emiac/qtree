@@ -17,15 +17,16 @@ module.exports = {
   extends: [
     // Base ESLint recommended rules
     'eslint:recommended',
+    'plugin:prettier/recommended',
 
     // Uncomment any of the lines below to choose desired strictness,
     // but leave only one uncommented!
     // See https://eslint.vuejs.org/rules/#available-rules
     // 'plugin:vue/vue3-essential', // Priority A: Essential (Error Prevention)
-    'plugin:vue/vue3-strongly-recommended', // Priority B: Strongly Recommended (Improving Readability)
+    'plugin:vue/vue3-strongly-recommended' // Priority B: Strongly Recommended (Improving Readability)
     // 'plugin:vue/vue3-recommended', // Priority C: Recommended (Minimizing Arbitrary Choices and Cognitive Overhead)
 
-    'prettier'
+    // 'prettier'
   ],
 
   plugins: [
@@ -53,6 +54,18 @@ module.exports = {
 
     indent: 'off',
 
+    'prettier/prettier': [
+      'error',
+      {
+        trailingComma: 'none',
+        tabWidth: 2,
+        useTabs: false,
+        semi: false,
+        singleQuote: true,
+        printWidth: 80,
+        endOfLine: 'lf'
+      }
+    ],
     // 'comma-dangle': 0,
 
     // allow debugger during development only
