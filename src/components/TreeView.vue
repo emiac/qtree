@@ -29,7 +29,7 @@
         size="md"
         label="Expand Top"
         no-caps
-        @click="expandTopLevel"
+        @click="treeStore.expandAccounts"
       ></q-btn>
       <q-btn
         class="q-ml-sm"
@@ -86,23 +86,23 @@ import { ref, watch } from 'vue'
 import { storeToRefs } from 'pinia'
 import { useTreeStore } from 'src/stores/tree.js'
 const treeStore = useTreeStore()
-const { tree, accountId } = storeToRefs(treeStore)
+const { tree, accountId, expandedId } = storeToRefs(treeStore)
 
 // This must be ref(null).  ref() does not work!
 const selectedId = ref(null)
-const expandedId = ref([])
 const isDense = ref(false)
 const isAccordion = ref(false)
 
 // Watch the tree and expand the top accounts when it changes
-watch(tree, () => {
-  expandedId.value = treeStore.expandAccounts()
+watch(tree, (curr, prev) => {
+  console.log('On tree change...')
+  console.log('curr: ', curr.length)
+  console.log('prev: ', prev.length)
+  if (curr.length > 0 && prev.length === 0) {
+    console.log('Expanding accounts on tree build...')
+    treeStore.expandAccounts()
+  }
 })
-
-const expandTopLevel = () => {
-  console.log('Tree.vue::expandTopLevel()')
-  expandedId.value = treeStore.expandTopLevels()
-}
 
 const expandAllLevels = () => {
   console.log('Tree.vue::expandAllLevels()')
