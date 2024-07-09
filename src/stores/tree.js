@@ -144,12 +144,35 @@ const getAllNodeIds = (node) => {
   }
 }
 
+// Recursive function to get all node id's down to a given type
+// The arguments are:
+//    tree [nodes]
+//    array of type
+//      Needs to include all type from top to bottom
+//      ['account', 'site'], ['account', 'site', 'asset'],
+//      ['account', 'site', 'asset', component] are valid
+const getAllNodeIdsByType = (node, types) => {
+  const ids = []
+  if (types.includes(node.type)) ids.push([node.id])
+
+  return ids
+}
+
 // Return all nodes in a tree with multiple root nodes
 const getAllTreeNodeIds = (nodeArr) => {
   console.log('getAllTreeNodeIds()')
   const ids = []
   nodeArr.forEach((a) => {
     ids.push(...getAllNodeIds(a))
+  })
+  return ids
+}
+
+// eslint-disable-next-line no-unused-vars
+const getAllTreeNodesOfType = (nodeArr) => {
+  const ids = []
+  nodeArr.forEach((n) => {
+    ids.push(...getAllNodeIdsByType(n))
   })
   return ids
 }
@@ -233,12 +256,20 @@ export const useTreeStore = defineStore('tree', () => {
     // return ids
   }
 
+  const specialFunction = () => {
+    // test if by expanding nodes down on the tree it forces the parent node to expand too
+    // expandedId.value = ['d6']
+    // Does not work.  Have to expand the parent nodes too
+    expandedId.value = ['n1', 'd2', 'd6']
+  }
+
   return {
     tree,
     accountId,
     expandedId,
     fetchTree,
     expandAccounts,
-    expandAllLevels
+    expandAllLevels,
+    specialFunction
   }
 })

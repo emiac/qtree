@@ -40,6 +40,7 @@
         no-caps
         @click="expandAllLevels"
       ></q-btn>
+
       <q-btn
         class="q-ml-sm"
         color="blue"
@@ -48,6 +49,16 @@
         label="Collapse All"
         no-caps
         @click="collapseAll"
+      ></q-btn>
+
+      <q-btn
+        class="q-ml-sm"
+        color="blue"
+        dense
+        size="md"
+        label="Special"
+        no-caps
+        @click="treeStore.specialFunction"
       ></q-btn>
     </div>
     <q-separator></q-separator>
