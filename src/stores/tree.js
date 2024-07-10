@@ -47,19 +47,7 @@ const addIcon = (node) => {
       break
     case 'asset':
       // asset
-      switch (node.subType) {
-        case 'truck':
-          icon = 'local_shipping'
-          break
-        case 'aircraft':
-          icon = 'flight'
-          break
-        case 'bus':
-          icon = 'directions_bus'
-          break
-        default:
-          icon = 'question_mark'
-      }
+      icon = node.subType
       break
     // component
     case 'component':
@@ -144,23 +132,49 @@ const getAllNodeIds = (node) => {
   }
 }
 
-// Recursive function to get all node id's down to a given type
-// The arguments are:
-//    tree [nodes]
-//    array of type
-//      Needs to include all type from top to bottom
-//      ['account', 'site'], ['account', 'site', 'asset'],
-//      ['account', 'site', 'asset', component] are valid
+const getNodeIdsOfNodesWithChildren = (node) => {
+  const ids = [node.id]
+  if (node.children) {
+    node.children.forEach((n) => {
+      if (n.children) {
+        ids.push(...getNodeIdsOfNodesWithChildren(n))
+      }
+    })
+    return ids
+  } else {
+    return ids
+  }
+}
+
 const getAllNodeIdsByType = (node, types) => {
+  // Recursive function to get all node id's down to a given type
+  // The arguments are:
+  //    tree [nodes]
+  //    array of type
+  //      Needs to include all type from top to bottom
+  //      ['account', 'site'], ['account', 'site', 'asset'],
+  //      ['account', 'site', 'asset', component] are valid
+
   const ids = []
-  if (types.includes(node.type)) ids.push([node.id])
+  if (types.includes(node.type)) {
+    ids.push(node.id)
+  }
+  if (node.children) {
+    node.children.forEach((n) => {
+      if (types.includes(n.type)) {
+        ids.push(...getAllNodeIdsByType(n, types))
+      }
+    })
+  } else {
+    return ids
+  }
 
   return ids
 }
 
-// Return all nodes in a tree with multiple root nodes
+// eslint-disable-next-line no-unused-vars
 const getAllTreeNodeIds = (nodeArr) => {
-  console.log('getAllTreeNodeIds()')
+  // Return all nodes in a tree with multiple root nodes
   const ids = []
   nodeArr.forEach((a) => {
     ids.push(...getAllNodeIds(a))
@@ -168,35 +182,21 @@ const getAllTreeNodeIds = (nodeArr) => {
   return ids
 }
 
-// eslint-disable-next-line no-unused-vars
-const getAllTreeNodesOfType = (nodeArr) => {
+const getNodeTreeNodeIdsOfNodesWithChildren = (nodeArr) => {
   const ids = []
-  nodeArr.forEach((n) => {
-    ids.push(...getAllNodeIdsByType(n))
+  nodeArr.forEach((a) => {
+    ids.push(...getNodeIdsOfNodesWithChildren(a))
   })
   return ids
 }
 
-// const getNodeIdsDownToType = (node) => {
-//   // const types = ['account', 'level', 'asset', 'component', 'sample-point', 'sample']
-//   // const index = types.findIndex(downToType)
-//   // if (index === -1) {
-//   //   return []
-//   // }
-//   const types = ['level', 'account']
-//   const idArr = []
-//   idArr.push(node.id)
-//   if (node.children) {
-//     const childIds = []
-//     node.children.forEach((c) => {
-//       if (types.includes(c.type)) {
-//         childIds.push(...traverse(c))
-//       }
-//     })
-//     idArr.push(...childIds)
-//   }
-//   return idArr
-// }
+const getAllTreeNodesOfType = (nodeArr, types) => {
+  const ids = []
+  nodeArr.forEach((n) => {
+    ids.push(...getAllNodeIdsByType(n, types))
+  })
+  return ids
+}
 
 export const useTreeStore = defineStore('tree', () => {
   // State
@@ -207,6 +207,7 @@ export const useTreeStore = defineStore('tree', () => {
   // Actions
   const fetchTree = async () => {
     // Returns a basic tree consisting of an account + sites only.
+    expandedId.value = []
     let accountIds
     if (!accountId.value) {
       accountIds = ['a1']
@@ -226,6 +227,7 @@ export const useTreeStore = defineStore('tree', () => {
     console.log('reply: ', reply.data)
 
     tree.value = fixTreeNodes(reply.data)
+    expandAccounts()
     // tree.value = reply.data
     console.log('treeStore.js::fetchTree() at end: tree: ', tree.value)
   }
@@ -234,26 +236,15 @@ export const useTreeStore = defineStore('tree', () => {
     tree.value.forEach((a) => {
       expandedId.value.push(a.id)
     })
+    console.log('expandAccounts().expandedId: ', expandedId.value)
   }
 
   const expandAllLevels = () => {
-    console.log('tree.js::expandAllLevels()')
-    const all_nodes = getAllTreeNodeIds(tree.value)
-    console.log('all_nodes: ', all_nodes)
-    console.log('expanding...')
-    expandedId.value = all_nodes
+    expandedId.value = getNodeTreeNodeIdsOfNodesWithChildren(tree.value)
+  }
 
-    // const ids = []
-    // tree.value.forEach((account) => {
-    //   ids.push(account.id)
-    //   if (account.children) {
-    //     account.children.forEach((c) => {
-    //       ids.push(c.id)
-    //       ids.push(...getNodeIdsDownToType(c))
-    //     })
-    //   }
-    // })
-    // return ids
+  const expandDownToLevels = () => {
+    expandedId.value = getAllTreeNodesOfType(tree.value, ['account'])
   }
 
   const specialFunction = () => {
@@ -270,6 +261,7 @@ export const useTreeStore = defineStore('tree', () => {
     fetchTree,
     expandAccounts,
     expandAllLevels,
+    expandDownToLevels,
     specialFunction
   }
 })

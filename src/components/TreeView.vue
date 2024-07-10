@@ -60,6 +60,16 @@
         no-caps
         @click="treeStore.specialFunction"
       ></q-btn>
+
+      <q-btn
+        class="q-ml-sm"
+        color="blue"
+        dense
+        size="md"
+        label="Expand All Levels"
+        no-caps
+        @click="treeStore.expandDownToLevels()"
+      ></q-btn>
     </div>
     <q-separator></q-separator>
     <div class="q-pa-md">
@@ -76,7 +86,8 @@
         <template #default-header="prop">
           <div
             class="row items-center"
-            :class="{ 'selected-class': prop.node.id === selectedId }"
+            :class="{ 'selected-node': prop.node.id === selectedId }"
+            style="width: 100%"
           >
             <q-icon
               :name="prop.node.icon"
@@ -106,11 +117,7 @@ const isAccordion = ref(false)
 
 // Watch the tree and expand the top accounts when it changes
 watch(tree, (curr, prev) => {
-  console.log('On tree change...')
-  console.log('curr: ', curr.length)
-  console.log('prev: ', prev.length)
   if (curr.length > 0 && prev.length === 0) {
-    console.log('Expanding accounts on tree build...')
     treeStore.expandAccounts()
   }
 })
@@ -118,7 +125,7 @@ watch(tree, (curr, prev) => {
 const expandAllLevels = () => {
   console.log('Tree.vue::expandAllLevels()')
   console.log(treeStore.expandAllLevels())
-  expandedId.value = treeStore.expandAllLevels()
+  treeStore.expandAllLevels()
 }
 
 const collapseAll = () => {
@@ -128,6 +135,6 @@ const collapseAll = () => {
 
 <style scoped>
 .selected-node {
-  background-color: pink;
+  background-color: rgb(228, 228, 228);
 }
 </style>
