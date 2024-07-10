@@ -25,9 +25,10 @@ module.exports = configure((/* ctx */) => ({
   css: ['app.scss'],
 
   // https://github.com/quasarframework/quasar/tree/dev/extras
+  // Ashley: npm install @quasar/extras in project folder
   extras: [
     // 'ionicons-v4',
-    // 'mdi-v7',
+    'mdi-v7',
     // 'fontawesome-v6',
     // 'eva-icons',
     // 'themify',

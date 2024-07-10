@@ -39,11 +39,11 @@ const addIcon = (node) => {
   switch (node.type) {
     // account
     case 'account':
-      icon = 'factory'
+      icon = 'mdi-factory'
       break
     // levels
     case 'site':
-      icon = 'folder'
+      icon = 'mdi-folder-account'
       break
     case 'asset':
       // asset
@@ -51,18 +51,18 @@ const addIcon = (node) => {
       break
     // component
     case 'component':
-      icon = 'settings'
+      icon = 'mdi-cog'
       break
     // sample point
     case 'sample-point':
-      icon = 'valve'
+      icon = 'mdi-pipe-valve'
       break
     // sample
     case 'sample':
-      icon = 'water_drop'
+      icon = 'mdi-water'
       break
     default:
-      icon = 'question_mark'
+      icon = 'mdi-help'
   }
   return icon
 }
@@ -119,8 +119,8 @@ const fixTreeNodes = (nodeArr) => {
   return tree
 }
 
-// Recursive function to get all node id's from a given root node
 const getAllNodeIds = (node) => {
+  // Recursive function to get all node id's from a given root node
   const ids = [node.id]
   if (node.children) {
     node.children.forEach((n) => {
@@ -233,6 +233,7 @@ export const useTreeStore = defineStore('tree', () => {
   }
 
   const expandAccounts = () => {
+    expandedId.value = []
     tree.value.forEach((a) => {
       expandedId.value.push(a.id)
     })

@@ -18,16 +18,17 @@ CREATE TABLE account (
     account_groupId INT NOT NULL,
     accountText VARCHAR(32) UNIQUE NOT NULL,
     accountActive TINYINT NOT NULL DEFAULT 1,
+    asset_typeId INT NOT NULL DEFAULT 7,
     PRIMARY KEY (accountId),
     UNIQUE INDEX idx_accountText (accountText)
 );
 
 INSERT INTO
-    account (account_groupId, accountText)
+    account (account_groupId, accountText, asset_typeId)
 VALUES
-  (1, 'ESB - Power Generation'),
-  (1, 'ESB - Networks'),
-  (1, 'ESB - 38kV');
+  (1, 'ESB - Power Generation', 6),
+  (1, 'ESB - Networks', 6),
+  (1, 'ESB - 38kV', 6);
 
 
 -- Sites have an extra classification as 'root' (boolean).
@@ -72,13 +73,16 @@ CREATE TABLE IF NOT EXISTS asset_type (
 INSERT INTO
   asset_type (asset_typeId, asset_typeText, asset_typeCode, asset_typeIcon)
 VALUES
-  (1,  'On-highway motor vehicle', 'RT', 'local_shipping'),
-  (2,  'Aircraft', 'AC', 'flight'),
-  (3,  'Car', 'RC', 'directions_car'),
-  (4,  'Bus', 'RB', 'directions_bus'),
-  (5,  'Off-highway vehicle', 'OV', 'front_loader'),
-  (6,  'Electrical', 'EL', 'charger'),
-  (7, 'Industrial', 'IN', 'precision_manufacturing');
+  (1,  'On-highway motor vehicle', 'RT', 'mdi-truck-cargo-container'),
+  (2,  'Aircraft - fixed wing', 'AP', 'mdi-airplane'),
+  (3,  'Car', 'RC', 'mdi-car'),
+  (4,  'Bus', 'RB', 'mdi-bus'),
+  (5,  'Off-highway vehicle', 'OV', 'mdi-excavator'),
+  (6,  'Electrical', 'EL', 'mdi-lightning-bolt'),
+  (7, 'Industrial', 'IN', 'mdi-robot-industrial'),
+  (8, 'Rail', 'LT', 'mdi-train'),
+  (9, 'Marine', 'MV', 'mdi-ferry'),
+  (10,  'Aircraft - rotary wing', 'AH', 'mdi-helicopter');
 
 CREATE TABLE IF NOT EXISTS asset (
   assetId INT UNIQUE NOT NULL AUTO_INCREMENT,
