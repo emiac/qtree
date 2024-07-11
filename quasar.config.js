@@ -43,13 +43,14 @@ module.exports = configure((/* ctx */) => ({
   build: {
     target: {
       browser: ['es2019', 'edge88', 'firefox78', 'chrome87', 'safari13.1'],
-      node: 'node20',
+      node: 'node20'
       // Following line was added to set up debugger
+      // probably not needed, for webpack only
       // See Quasar docs "Confugure VS Code"
-      devtool: 'source-map'
+      // devtool: 'source-map'
     },
 
-    vueRouterMode: 'hash', // available values: 'hash', 'history'
+    vueRouterMode: 'history', // available values: 'hash', 'history'
     // vueRouterBase,
     // vueDevtools,
     // vueOptionsAPI: false,

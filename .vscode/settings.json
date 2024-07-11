@@ -3,8 +3,14 @@
   "editor.guides.bracketPairs": true,
   // General settings
   "editor.tabSize": 2, // Default setting for all files
+  "editor.indentSize": "tabSize",
   "editor.detectIndentation": false, // Ensure VSCode doesn't override settings
   "editor.insertSpaces": true, // Use spaces instead of tabs based on file content
+  "editor.formatOnSave": true,
+  "editor.defaultFormatter": "esbenp.prettier-vscode",
+  "editor.codeActionsOnSave": ["source.fixAll.eslint"],
+  "eslint.validate": ["javascript", "javascriptreact", "typescript", "vue"],
+  "prettier.requireConfig": true,
 
   // Python specific settings
   "[python]": {
@@ -26,17 +32,10 @@
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
 
-  "editor.formatOnSave": true,
-  "editor.defaultFormatter": "esbenp.prettier-vscode",
-  "editor.codeActionsOnSave": ["source.fixAll.eslint"],
-  "eslint.validate": ["javascript", "javascriptreact", "typescript", "vue"],
-  "prettier.requireConfig": true,
-
   "python.analysis.typeCheckingMode": "basic",
   "python.analysis.autoImportCompletions": true,
   "python.languageServer": "Pylance",
   "python.analysis.diagnosticSeverityOverrides": {
     "reportOptionalMemberAccess": false
-  },
-  "editor.indentSize": "tabSize"
+  }
 }
