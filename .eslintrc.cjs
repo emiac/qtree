@@ -56,20 +56,6 @@ module.exports = {
     'vue/max-attributes-per-line': 'off',
     indent: 'off',
 
-    // 'prettier/prettier': [
-    //   'error',
-    //   {
-    //     trailingComma: 'none',
-    //     tabWidth: 2,
-    //     useTabs: false,
-    //     semi: false,
-    //     singleQuote: true,
-    //     printWidth: 80,
-    //     endOfLine: 'auto'
-    //   }
-    // ],
-    // 'comma-dangle': 0,
-
     // allow debugger during development only
     'no-debugger': process.env.NODE_ENV === 'production' ? 'error' : 'off'
   }
