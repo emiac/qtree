@@ -15,20 +15,17 @@
   // Python specific settings
   "[python]": {
     "editor.tabSize": 4
-    // "editor.insertSpaces": true // Use spaces instead of tabs
   },
 
   // JavaScript specific settings
   "[javascript]": {
     "editor.tabSize": 2,
-    // "editor.insertSpaces": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
 
   // Vue specific settings
   "[vue]": {
     "editor.tabSize": 2,
-    // "editor.insertSpaces": true,
     "editor.defaultFormatter": "esbenp.prettier-vscode"
   },
 
